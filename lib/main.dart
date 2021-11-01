@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:tugas_kel27/splash.dart';
 
 void main() async {

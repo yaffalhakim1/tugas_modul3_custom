@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:tugas_kel27/detail.dart';
 import 'package:tugas_kel27/profile.dart';
+import 'package:tugas_kel27/profiles.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -13,52 +14,69 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   Future<List<AiringModel>> airing;
   Future<List<Top>> top;
-  int selectedIndex = 0;
-  void _onItemTapped(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
-  }
 
   @override
   void initState() {
     super.initState();
     airing = fetchAiring();
-    top = fetchShows();
+    top = fetchTop();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xff1F1D2B),
       body: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 20, right: 20),
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 30),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(Icons.search),
+                  Icon(
+                    Icons.search,
+                    color: Colors.white,
+                    size: 30,
+                  ),
                   Text(
-                    'AIRING NOW',
+                    'Wibu List',
                     style: GoogleFonts.poppins(
                       textStyle: TextStyle(
-                          color: Colors.black, letterSpacing: .5, fontSize: 15),
+                          color: Colors.white, letterSpacing: .5, fontSize: 20),
                     ),
                   ),
-                  Icon(Icons.settings),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => Profile()));
+                    },
+                    child: Icon(
+                      Icons.account_circle,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
                 ],
               ),
             ),
-            // Row(
-            //   children: [
-
-            //   ],
-            // ),
             Padding(
-              padding: const EdgeInsets.only(left: 20),
+              padding: const EdgeInsets.only(left: 20, top: 30),
+              child: Text(
+                'AIRING NOW',
+                style: GoogleFonts.poppins(
+                  textStyle: TextStyle(
+                      color: Colors.white, letterSpacing: .5, fontSize: 15),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 20,
+                top: 20,
+              ),
               child: SizedBox(
                 height: 180.0,
                 child: FutureBuilder<List<AiringModel>>(
@@ -66,7 +84,7 @@ class _HomeState extends State<Home> {
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         return ListView.builder(
-                          physics: ClampingScrollPhysics(),
+                          physics: BouncingScrollPhysics(),
                           shrinkWrap: true,
                           scrollDirection: Axis.horizontal,
                           itemCount: snapshot.data.length,
@@ -83,44 +101,84 @@ class _HomeState extends State<Home> {
                                 ),
                               );
                             },
-                            child: Card(
-                              elevation: 0,
-                              child: Container(
-                                height: 150,
-                                width: 100,
-                                child: Column(
-                                  children: [
-                                    Container(
-                                        height: 150,
-                                        child: Image.network(
-                                            snapshot.data[index].image)),
-                                    Text(
-                                      snapshot.data[index].title,
-                                      overflow: TextOverflow.ellipsis,
+                            child: Container(
+                              margin: EdgeInsets.only(right: 10),
+                              height: 400,
+                              width: 315,
+                              decoration: BoxDecoration(
+                                  color: Color(0xff252836),
+                                  borderRadius: BorderRadius.circular(12)),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Stack(
+                                    children: [
+                                      Image.network(
+                                        snapshot.data[index].image,
+                                        fit: BoxFit.cover,
+                                        width: 315,
+                                        height: 110,
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          snapshot.data[index].title,
+                                          style: GoogleFonts.poppins(
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              letterSpacing: 0.2),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                        SizedBox(
+                                          height: 2,
+                                        ),
+                                        Text(
+                                          snapshot.data[index].rating
+                                              .toString(),
+                                          style: GoogleFonts.poppins(
+                                              fontWeight: FontWeight.w400,
+                                              color: Colors.grey,
+                                              fontSize: 14,
+                                              letterSpacing: 0.2),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
+                                  )
+                                ],
                               ),
                             ),
                           ),
                         );
+                      } else if (snapshot.hasError) {
+                        return Text('Gagal menampilkan data Airing');
                       }
                       return CircularProgressIndicator();
                     }),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 24, top: 20),
+              padding: const EdgeInsets.only(left: 20, top: 20),
               child: Text(
                 'TOP ANIME',
                 style: GoogleFonts.poppins(
                   textStyle: TextStyle(
-                      color: Colors.black, letterSpacing: .5, fontSize: 15),
+                      color: Colors.white, letterSpacing: .5, fontSize: 15),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 24),
+              padding: const EdgeInsets.only(left: 20),
               child: SizedBox(
                 // height: 200.0,
                 child: FutureBuilder<List<Top>>(
@@ -132,24 +190,53 @@ class _HomeState extends State<Home> {
                           shrinkWrap: true,
                           itemCount: snapshot.data.length,
                           itemBuilder: (BuildContext context, int index) =>
-                              ListTile(
-                            leading: Image.network(
-                              snapshot.data[index].imageUrl,
-                            ),
-                            title: Text(snapshot.data[index].title),
-                            subtitle:
-                                Text(snapshot.data[index].score.toString()),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => DetailPage(
-                                    title: snapshot.data[index].title,
-                                    item: snapshot.data[index].malId,
-                                  ),
+                              Padding(
+                            padding: const EdgeInsets.only(right: 20),
+                            child: Card(
+                              color: Color(0xff252836),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              elevation: 0,
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 20.0, vertical: 10.0),
+                                leading: CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage: NetworkImage(
+                                      snapshot.data[index].imageUrl),
                                 ),
-                              );
-                            },
+                                title: Text(
+                                  snapshot.data[index].title,
+                                  style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      letterSpacing: 0.2),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                                subtitle: Text(
+                                  snapshot.data[index].score.toString(),
+                                  style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                      letterSpacing: 0.2),
+                                ),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DetailPage(
+                                        title: snapshot.data[index].title,
+                                        item: snapshot.data[index].malId,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                           ),
                         );
                       }
@@ -159,17 +246,6 @@ class _HomeState extends State<Home> {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-        currentIndex: selectedIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-        onTap: _onItemTapped,
       ),
     );
   }
@@ -242,7 +318,7 @@ class Top {
 }
 
 // function untuk fetch api
-Future<List<Top>> fetchShows() async {
+Future<List<Top>> fetchTop() async {
   String api = 'https://api.jikan.moe/v3/top/anime/1';
   final response = await http.get(
     Uri.parse(api),
